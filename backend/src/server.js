@@ -57,13 +57,48 @@ const connectWithRetry = () => {
   mongoose.connect(mongoUri)
     .then(() => {
       console.log('Connected successfully to MongoDB!');
+
+      // start the server AFTER MongoDB connection succeeds
+      const server = http.createServer(app);
+      const io = new Server(server, {
+        cors: {
+          origin: allowedOrigins,
+          credentials: true
+        }
+      });
+
+      const onlineUsers = new Map(); 
+      io.on("connection", (socket) => {
+        console.log(`Socket connected: ${socket.id}`);
+        socket.on("registerUser", (userId) => {
+          if (!onlineUsers.has(userId)) onlineUsers.set(userId, new Set());
+          onlineUsers.get(userId).add(socket.id);
+          console.log(`Registered socket ${socket.id} for user ${userId}`);
+        });
+        socket.on("disconnect", () => {
+          console.log(`Socket disconnected: ${socket.id}`);
+          for (const [userId, sockets] of onlineUsers.entries()) {
+            sockets.delete(socket.id);
+            if (sockets.size === 0) onlineUsers.delete(userId);
+          }
+        });
+      });
+
+      app.set('io', io);
+      app.set('onlineUsers', onlineUsers);
+
+      server.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+      });
+
     })
     .catch(err => {
       console.error('MongoDB connection error. Retrying in 5 seconds...', err.message);
       setTimeout(connectWithRetry, 5000); 
     });
 };
-connectWithRetry(); 
+connectWithRetry();
+
 
 const server = http.createServer(app);
 const io = new Server(server, {
