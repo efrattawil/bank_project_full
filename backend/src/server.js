@@ -19,7 +19,12 @@ const app = express();
 const port = process.env.PORT || 5000;
 const mongoUri = process.env.MONGODB_URI; 
 
-const allowedOrigins = ['http://localhost:3001', 'http://bank_frontend:5173']; 
+const allowedOrigins = [
+  'http://localhost:3001',
+  'http://bank_frontend:5173',
+  'https://bank-project-front.onrender.com',
+  'https://bank-project-full-2.onrender.com'
+];
 const corsOptions = {
   origin: (origin, callback) => {
     if (allowedOrigins.includes(origin) || !origin) {
@@ -95,13 +100,6 @@ io.on("connection", (socket) => {
 
 app.set('io', io);
 app.set('onlineUsers', onlineUsers);
-
-// --- Serve Frontend Build ---
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
-});
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
