@@ -1,5 +1,11 @@
 require('dotenv').config(); 
+process.on('uncaughtException', err => console.error('Uncaught Exception:', err));
+process.on('unhandledRejection', err => console.error('Unhandled Rejection:', err));
+
+console.log('Starting server...');
 console.log('MONGODB_URI =', process.env.MONGODB_URI);
+console.log('PORT =', process.env.PORT);
+
 
 const express = require('express');
 const mongoose = require('mongoose');
