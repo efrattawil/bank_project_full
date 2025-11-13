@@ -16,8 +16,8 @@ const { protect } = require('./middleware/auth.middleware');
 const BASE_PATH = '/bank_app/api/v1';
 
 const app = express();
-const port = process.env.PORT || 3000;
-const mongoUri = process.env.MONGODB_URI || 'mongodb://db:27017/bank_db'; 
+const port = process.env.PORT || 5000;
+const mongoUri = process.env.MONGODB_URI; 
 
 const allowedOrigins = ['http://localhost:3001', 'http://bank_frontend:5173']; 
 const corsOptions = {
