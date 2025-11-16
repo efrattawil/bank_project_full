@@ -27,13 +27,11 @@ services:
       - "80:5173"
     environment:
       VITE_API_BASE: http://bank_app:5000/bank_app/api/v1 
-    volumes:
-      - ${PWD}/frontend:/app
-      - /app/node_modules
+    # הוסר ה-volumes שמפריע ל-Build הדו-שלבי
     depends_on:
           app:
             condition: service_started
-    command: sh -c "npm install && npm run build && npm run preview -- --port 5173 --host 0.0.0.0"
+    # הוסר ה-command המפריע, כעת משתמש ב-CMD של ה-Dockerfile
     networks:
       - bank-network 
 
