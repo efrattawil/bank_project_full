@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_BASE || 'http://localhost:5000/bank_app/api/v1';
+const RENDER_BACKEND_URL = 'https://bank-project-full-1.onrender.com/bank_app/api/v1'; 
+
+const API_URL = import.meta.env.VITE_API_BASE || RENDER_BACKEND_URL;
 
 let tabId = sessionStorage.getItem('tabId');
 if (!tabId) {
