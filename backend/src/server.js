@@ -105,5 +105,3 @@ const connectWithRetry = () => {
     });
 };
 
-connectWithRetry(); 
-
