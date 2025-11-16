@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 exports.sendVerificationEmail = async (email, verificationURL) => {
     try {
         const mailOptions = {
-            from: `"Bank System" <${process.env.EMAIL_USER}>'`,
+            from: `"Bank System" <${process.env.EMAIL_USER}>`,
             to: email,
             subject: 'Account Verification Required',
             html: `
