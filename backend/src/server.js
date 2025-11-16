@@ -29,8 +29,8 @@ const mongoUri = process.env.MONGODB_URI;
 const allowedOrigins = [
   'http://localhost:3001',
   'http://bank_frontend:5173',
-  'https://bank-project-front.onrender.com',
-  'https://bank-project-full-2.onrender.com'
+  'https://bank-project-front.onrender.com', 
+  'https://bank-project-full-2.onrender.com' 
 ];
 const corsOptions = {
   origin: (origin, callback) => {
@@ -58,13 +58,12 @@ app.get('/', (req, res) => {
   res.status(200).send('Bank System Backend is Running!');
 });
 
+
 const connectWithRetry = () => {
   console.log('Attempting to connect to MongoDB...');
   mongoose.connect(mongoUri)
     .then(() => {
       console.log('Connected successfully to MongoDB!');
-
-      // start the server AFTER MongoDB connection succeeds
       const server = http.createServer(app);
       const io = new Server(server, {
         cors: {
@@ -76,11 +75,13 @@ const connectWithRetry = () => {
       const onlineUsers = new Map(); 
       io.on("connection", (socket) => {
         console.log(`Socket connected: ${socket.id}`);
+        
         socket.on("registerUser", (userId) => {
           if (!onlineUsers.has(userId)) onlineUsers.set(userId, new Set());
           onlineUsers.get(userId).add(socket.id);
           console.log(`Registered socket ${socket.id} for user ${userId}`);
         });
+
         socket.on("disconnect", () => {
           console.log(`Socket disconnected: ${socket.id}`);
           for (const [userId, sockets] of onlineUsers.entries()) {
@@ -103,46 +104,6 @@ const connectWithRetry = () => {
       setTimeout(connectWithRetry, 5000); 
     });
 };
-connectWithRetry();
 
+connectWithRetry(); 
 
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-    credentials: true
-  }
-});
-
-const onlineUsers = new Map(); 
-
-io.on("connection", (socket) => {
-  console.log(`Socket connected: ${socket.id}`);
-
-  socket.on("registerUser", (userId) => {
-    if (!onlineUsers.has(userId)) {
-      onlineUsers.set(userId, new Set());
-    }
-    onlineUsers.get(userId).add(socket.id);
-    console.log(`Registered socket ${socket.id} for user ${userId}`);
-  });
-
-  socket.on("disconnect", () => {
-    console.log(`Socket disconnected: ${socket.id}`);
-
-    for (const [userId, sockets] of onlineUsers.entries()) {
-      sockets.delete(socket.id); 
-      if (sockets.size === 0) {
-        onlineUsers.delete(userId); 
-        console.log(`All sockets closed for user ${userId}`);
-      }
-    }
-  });
-});
-
-app.set('io', io);
-app.set('onlineUsers', onlineUsers);
-
-server.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
