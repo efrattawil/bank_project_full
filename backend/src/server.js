@@ -105,3 +105,6 @@ const connectWithRetry = () => {
     });
 };
 
+if (require.main === module) {
+    connectWithRetry(); 
+}
