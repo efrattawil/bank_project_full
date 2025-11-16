@@ -18,4 +18,6 @@ RUN npm install --production
 
 EXPOSE 5173
 
-CMD ["sh", "-c", "vite preview --host 0.0.0.0 --port 5173"]
+ENTRYPOINT ["/bin/sh", "-c"] 
+
+CMD ["npm run start"]
