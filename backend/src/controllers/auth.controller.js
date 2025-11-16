@@ -102,21 +102,19 @@ exports.signup = async (req, res) => {
 exports.verifyAccount = async (req, res) => {
     const { token, pin } = req.query;
 
-    if ( !token || !pin ){
-        return res.status(400).json({ message : 'Missing verification token on PIN.'});
+    if (!token || !pin) {
+        return res.status(400).json({ message: 'Missing verification token or PIN.' });
     }
 
     try {
         let decoded;
-
         try {
-            // check token expiry
             decoded = jwt.verify(token, process.env.JWT_SECRET);
-        } catch (jwtError){
-            if (jwtError.name === 'TokenExpiredError'){
-                return res.status(401).json({ message : 'Verification link expired. Please sign up again or request a new link.'});
-            } 
-            return res.status(401).json({ message : 'Invalid verification token.'});
+        } catch (jwtError) {
+            if (jwtError.name === 'TokenExpiredError') {
+                return res.status(401).json({ message: 'Verification link expired. Please sign up again or request a new link.' });
+            }
+            return res.status(401).json({ message: 'Invalid verification token.' });
         }
 
         const userId = decoded.userId;
@@ -126,23 +124,22 @@ exports.verifyAccount = async (req, res) => {
             sixDigitPin: pin
         });
 
-        if (!verificationRecord){
-            return res.status(404).json({ message : 'Invalid PIN or token/PIN combination not found.'});
+        if (!verificationRecord) {
+            return res.status(404).json({ message: 'Invalid PIN or token/PIN combination not found.' });
         }
 
         const user = await User.findById(userId);
 
-        if (!user){
-            return res.status(404).json({ message : 'User not found.'});
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
         }
 
-        if (user.status === 'active'){
-            return res.status(200).json({ message : 'Account already active. You can now log in.'});
+        if (user.status === 'active') {
+            return res.status(200).json({ message: 'Account already active. You can now log in.' });
         }
 
         user.status = 'active';
         await user.save();
-
         await VerificationToken.deleteOne({ _id: verificationRecord._id });
 
         res.status(200).json({
@@ -154,9 +151,9 @@ exports.verifyAccount = async (req, res) => {
             }
         });
 
-    } catch (error){
+    } catch (error) {
         console.error('Verification Error:', error);
-        res.status(500).json({ message: 'Server error during account verification'});
+        res.status(500).json({ message: 'Server error during account verification' });
     }
 };
 

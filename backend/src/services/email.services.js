@@ -1,19 +1,32 @@
 const nodemailer = require('nodemailer');
+const jwt = require("jsonwebtoken");
 
-const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    secure: false,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
+let transporter;
+if (process.env.EMAIL_HOST === "smtp.ethereal.email") {
+    transporter = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: 587,
+        secure: false,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+        }
+    });
+}
 
-exports.sendVerificationEmail = async (email, verificationURL) => {
+exports.sendVerificationEmail = async (email, userId, pin) => {
     try {
+        // יוצרים JWT token
+        const token = jwt.sign(
+            { userId },
+            process.env.JWT_SECRET,
+            { expiresIn: "5m" } // 5 דקות
+        );
 
-        // אם רצים ב-Render (production) – לא שולחים אימייל באמת
+        // בונים לינק עם BASE_URL (לוקאלית או Render)
+        const verificationURL = `${process.env.BASE_URL}/bank_app/api/v1/auth/verify?token=${token}&pin=${pin}`;
+
+        // אם אנחנו ב-Render או לא רוצים לשלוח מייל אמיתי
         if (process.env.RENDER === "true") {
             console.log("=== SIMULATED EMAIL (RENDER MODE) ===");
             console.log("To:", email);
@@ -22,7 +35,7 @@ exports.sendVerificationEmail = async (email, verificationURL) => {
             return { simulated: true };
         }
 
-        // לוקאלי – שולחים אימייל עם Ethereal
+        // לוקאלית – שולחים אימייל אמיתי עם Ethereal
         const mailOptions = {
             from: `"Bank System" <${process.env.EMAIL_USER}>`,
             to: email,
@@ -50,6 +63,6 @@ exports.sendVerificationEmail = async (email, verificationURL) => {
 
     } catch (error) {
         console.error("ERROR DETAILS:", error);
-        return { error: true, message: "Failed to send email (but app continues running)" };
+        return { error: true, message: "Failed to send email (app continues running)" };
     }
 };
