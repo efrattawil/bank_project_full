@@ -39,7 +39,7 @@ exports.sendVerificationEmail = async (email, verificationURL) => {
         return info;
 
     } catch (error) {
-        console.error("Error sending verification email:", email);
+        console.error("ERROR DETAILSף", error);
         throw new Error("Failed to send verification email.");
     }
 };
