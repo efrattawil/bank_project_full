@@ -22,9 +22,8 @@ exports.sendVerificationEmail = async (email, userId, pin) => {
             { expiresIn: "5m" } 
         );
 
-        const verificationURL = `${process.env.BASE_URL}/auth/verify?token=${token}&pin=${pin}`;
+        const verificationURL = `${process.env.BASE_URL}?token=${token}&pin=${pin}`;
 
-        // אם אנחנו ב-Render או לא רוצים לשלוח מייל אמיתי
         if (process.env.RENDER === "true") {
             console.log("=== SIMULATED EMAIL (RENDER MODE) ===");
             console.log("To:", email);
@@ -33,7 +32,6 @@ exports.sendVerificationEmail = async (email, userId, pin) => {
             return { simulated: true };
         }
 
-        // לוקאלית – שולחים אימייל אמיתי עם Ethereal
         const mailOptions = {
             from: `"Bank System" <${process.env.EMAIL_USER}>`,
             to: email,

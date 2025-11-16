@@ -13,7 +13,7 @@ if (!tabId) {
 const api = axios.create({
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
-  withCredentials: true, // מאפשר cookie/session אם צריך
+  withCredentials: true, 
 });
 
 api.interceptors.request.use(
@@ -24,7 +24,7 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     } else {
-      delete config.headers.Authorization; // מנקה אם אין טוקן
+      delete config.headers.Authorization; 
     }
 
     return config;

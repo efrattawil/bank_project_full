@@ -77,7 +77,7 @@ exports.signup = async (req, res) => {
 
         const verificationURL = `http://localhost:5000/bank_app/api/v1/auth?token=${token}&pin=${sixDigitPin}`;
 
-        await sendVerificationEmail(newUser.email, verificationURL);
+        await sendVerificationEmail(newUser.email, newUser._id, sixDigitPin);
 
         res.status(201).json({ 
             message: 'User registered successfully. Verification link sent to your email.',
