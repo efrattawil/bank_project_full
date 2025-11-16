@@ -9,4 +9,6 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["npm", "start"]
+ENTRYPOINT ["node"]
+
+CMD ["src/server.js"]
